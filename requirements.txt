@@ -12,3 +12,8 @@ transformers==4.39.2
 gdown
 requests
 imageio[ffmpeg]
+
+omegaconf
+ffmpeg-python
+gradio
+spaces
