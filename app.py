@@ -26,6 +26,9 @@ from argparse import Namespace
 import shutil
 import gdown
 import imageio
+import ffmpeg
+from moviepy.editor import *
+
 
 ProjectDir = os.path.abspath(os.path.dirname(__file__))
 CheckpointsDir = os.path.join(ProjectDir, "models")
@@ -244,25 +247,65 @@ def inference(audio_path,video_path,bbox_shift,progress=gr.Progress(track_tqdm=T
     # 保存视频
     imageio.mimwrite(output_video, images, 'FFMPEG', fps=fps, codec='libx264', pixelformat='yuv420p')
 
-
     # cmd_combine_audio = f"ffmpeg -y -v fatal -i {audio_path} -i temp.mp4 {output_vid_name}"
     # print(cmd_combine_audio)
     # os.system(cmd_combine_audio)
 
-    input_video = 'temp.mp4'
-
+    input_video = './temp.mp4'
+    # Check if the input_video and audio_path exist
+    if not os.path.exists(input_video):
+        raise FileNotFoundError(f"Input video file not found: {input_video}")
+    if not os.path.exists(audio_path):
+        raise FileNotFoundError(f"Audio file not found: {audio_path}")
+    
     # 读取视频
     reader = imageio.get_reader(input_video)
     fps = reader.get_meta_data()['fps']  # 获取原视频的帧率
 
     # 将帧存储在列表中
-    frames = [im for im in reader]
+    frames = images
 
     # 保存视频并添加音频
-    imageio.mimwrite(output_vid_name, frames, 'FFMPEG', fps=fps, codec='libx264', audio_codec='aac', input_params=['-i', audio_path])
+    # imageio.mimwrite(output_vid_name, frames, 'FFMPEG', fps=fps, codec='libx264', audio_codec='aac', input_params=['-i', audio_path])
+    
+    # input_video = ffmpeg.input(input_video)
+    
+    # input_audio = ffmpeg.input(audio_path)
+    
+    print(len(frames))
+
+    # imageio.mimwrite(
+    #     output_video,
+    #     frames,
+    #     'FFMPEG',
+    #     fps=25,
+    #     codec='libx264',
+    #     audio_codec='aac',
+    #     input_params=['-i', audio_path],
+    #     output_params=['-y'],  # Add the '-y' flag to overwrite the output file if it exists
+    # )
+    # writer = imageio.get_writer(output_vid_name, fps = 25, codec='libx264', quality=10, pixelformat='yuvj444p')
+    # for im in frames:
+    #     writer.append_data(im)
+    # writer.close()
+
+
+
+
+    # Load the video
+    video_clip = VideoFileClip(input_video)
+
+    # Load the audio
+    audio_clip = AudioFileClip(audio_path)
+
+    # Set the audio to the video
+    video_clip = video_clip.set_audio(audio_clip)
+
+    # Write the output video
+    video_clip.write_videofile(output_vid_name, codec='libx264', audio_codec='aac',fps=25)
 
     os.remove("temp.mp4")
-    shutil.rmtree(result_img_save_path)
+    #shutil.rmtree(result_img_save_path)
     print(f"result is save to {output_vid_name}")
     return output_vid_name,bbox_shift_text
 
