@@ -49,7 +49,6 @@ def download_model():
             local_dir=CheckpointsDir,
             max_workers=8,
             local_dir_use_symlinks=True,
-            force_download=True, resume_download=False
         )
         # weight
         os.makedirs(f"{CheckpointsDir}/sd-vae-ft-mse/")
@@ -58,7 +57,6 @@ def download_model():
             local_dir=CheckpointsDir+'/sd-vae-ft-mse',
             max_workers=8,
             local_dir_use_symlinks=True,
-            force_download=True, resume_download=False
         )
         #dwpose
         os.makedirs(f"{CheckpointsDir}/dwpose/")
@@ -67,7 +65,6 @@ def download_model():
             local_dir=CheckpointsDir+'/dwpose',
             max_workers=8,
             local_dir_use_symlinks=True,
-            force_download=True, resume_download=False
         )
         #vae
         url = "https://openaipublic.azureedge.net/main/whisper/models/65147644a518d12f04e32d6f3b26facc3f8dd46e5390956a9424a650c0ce22b9/tiny.pt"
@@ -409,5 +406,5 @@ port_number = 7860  # Replace with your desired port number
 
 
 demo.queue().launch(
-    share=False , debug=True, server_name=ip_address, server_port=port_number
+    share=True , debug=True, show_error=True #server_name=ip_address, server_port=port_number
 )
